@@ -40,7 +40,7 @@ def load_system_prompt(file_path):
 #     model_name = settings.get("model", "gpt-4o")
 #     return ChatOpenAI(model=model_name, openai_api_key=os.getenv("OPENAI_API_KEY"))
 
-def get_model_from_config(config):
+def get_model_from_config():
     api_key = "sk-wzahzejbmyrpdluvpopvijotobnslviwgnbildslbekjausu"
     base_url = "https://api.siliconflow.cn/v1"
     return init_chat_model(
@@ -54,7 +54,18 @@ def get_model_from_config(config):
 
 async def main(user_input):
     mcp_config = load_mcp_config()
-    model = get_model_from_config(mcp_config)
+    # 检查模型是否可用
+    try:
+        model = get_model_from_config()
+        # 测试模型是否正常响应
+        test_response = model.invoke([HumanMessage(content="test")])
+        if not test_response:
+            raise Exception("模型响应为空")
+        print("模型加载成功并可用")
+    except Exception as e:
+        print(f"模型加载失败: {str(e)}")
+        sys.exit(1)
+    
     
     system_prompt_path = mcp_config.get("settings", {}).get("system_prompt_path")
     if system_prompt_path:
@@ -110,6 +121,7 @@ async def main(user_input):
                 "messages": [HumanMessage(content=user_input)]
             }
         )
+        
 
         parsed_data = parse_ai_messages(review_requested)
         for ai_message in parsed_data:
@@ -127,5 +139,5 @@ def parse_ai_messages(data):
     return formatted_ai_responses
 
 if __name__ == "__main__":
-    user_query = "偏头痛"
+    user_query = "咳嗽怎么办？"
     asyncio.run(main(user_query))
