@@ -1,0 +1,57 @@
+engines:
+  - name: 360search
+    engine: 360search
+    shortcut: 360so
+    disabled: true
+
+  - name: 360search videos
+    engine: 360search_videos
+    shortcut: 360sov
+    disabled: true
+    
+  - name: sogou
+    engine: sogou
+    shortcut: sogou
+    disabled: true
+
+  - name: sogou images
+    engine: sogou_images
+    shortcut: sogoui
+    disabled: true
+
+  - name: sogou videos
+    engine: sogou_videos
+    shortcut: sogouv
+    disabled: true
+
+  - name: sogou wechat
+    engine: sogou_wechat
+    shortcut: sogouw
+    disabled: true
+
+  - name: baidu
+    baidu_category: general
+    categories: [general]
+    engine: baidu
+    shortcut: bd
+    disabled: true
+
+  - name: baidu images
+    baidu_category: images
+    categories: [images]
+    engine: baidu
+    shortcut: bdi
+    disabled: true
+
+  - name: baidu kaifa
+    baidu_category: it
+    categories: [it]
+    engine: baidu
+    shortcut: bdk
+    disabled: true
+
+            "h5.baike.qq.com/mobile",
+            "xiaohe.cn/medical",
+            "a-hospital.com",
+            "msdmanuals.cn",
+            "fh21.com",
