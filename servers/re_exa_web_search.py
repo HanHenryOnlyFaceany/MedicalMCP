@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
 import os
@@ -52,7 +53,7 @@ def load_config() -> Dict[str, Any]:
 
 # 加载配置
 config = load_config()
-medical_sites = config.get('re_websearch', {}).get('medical_sites', [])
+medical_site = config.get('re_websearch', {}).get('medical_sites', [])
 
 
 mcp = FastMCP(
@@ -66,27 +67,30 @@ mcp = FastMCP(
     """
 )
 
-class SearchParams(BaseModel):
-    q: str
-    pageno: int = 1
-    categories: List[SearXNGCategory] = None
-    engines: str = ''
-    language: str = 'all'
-    medical_sites: List[str] = medical_sites
+# class SearchParams(BaseModel):
+#     q: str
+#     pageno: int = 1
+#     categories: List[SearXNGCategory] = None
+#     engines: str = ''
+#     language: str = 'all'
+#     medical_sites: List[str] = medical_sites
 
-    def __init__(self, **data):
-        categories = data.get('categories') or [SearXNGCategory.GENERAL,SearXNGCategory.IMAGES]
-        super().__init__(**{**data, 'categories': categories})
+#     def __init__(self, **data):
+#         # 添加编码处理
+#         if 'q' in data and isinstance(data['q'], bytes):
+#             data['q'] = data['q'].decode('utf-8')
+#         categories = data.get('categories') or [SearXNGCategory.GENERAL,SearXNGCategory.IMAGES]
+#         super().__init__(**{**data, 'categories': categories})
 
-    def to_dict(self) -> Dict[str, Any]:
-        """转换为字典格式"""
-        return {
-            'q': self.q,
-            'pageno': self.pageno,
-            'categories': [cat.value for cat in self.categories],
-            'engines': self.engines,
-            'language': self.language,
-        }
+#     def to_dict(self) -> Dict[str, Any]:
+#         """转换为字典格式"""
+#         return {
+#             'q': self.q.encode('utf-8').decode('utf-8') if isinstance(self.q, str) else self.q,
+#             'pageno': self.pageno,
+#             'categories': [cat.value for cat in self.categories],
+#             'engines': self.engines,
+#             'language': self.language,
+#         }
 
 def filter_medical_results(results: List[Dict[str, Any]], medical_sites: List[str]) -> List[Dict[str, Any]]:
     """
@@ -111,23 +115,25 @@ def filter_medical_results(results: List[Dict[str, Any]], medical_sites: List[st
     ]
 
 @mcp.tool()
-async def me_search_web(params: SearchParams) -> str:
+async def me_search_web(
+    query: str,
+    pageno: int = 1,
+    categories: List[SearXNGCategory] = [SearXNGCategory.VIDEOS],
+    engines: str = None,
+    language: str = 'all',
+) -> str:
     """
-    使用 SearXNG 进行搜索
+    使用 SearXNG 搜索医疗健康相关信息，并返回格式化的 Markdown 结果。
     
-    参数:
-        params: SearchParams 对象，包含所有搜索参数
-    
-    返回:
-        返回JSON格式的搜索结果列表,需要通过format转换为str
+    Args:
+        query: str - 搜索关键词
+                    
+    Returns:
+        str: Markdown 格式的搜索结果，包含标题、链接、摘要和图片
     """
     try:
-        q = params.q
-        pageno = params.pageno
-        categories = params.categories
-        engines = params.engines
-        language = params.language
-        medical_sites = params.medical_sites
+        q = query
+        medical_sites = medical_site
         # 获取安全搜索级别
         safesearch = os.environ.get('SEARXNG_SAFE', 0)
 
@@ -151,6 +157,8 @@ async def me_search_web(params: SearchParams) -> str:
                 method='POST',
                 query=query
             )
+            print(f"HTTP Response Status: {res.status_code}")  # 添加状态码输出
+            print(f"Response Content: {res.text[:200]}")  # 打印响应内容前200个字符
             result = res.json()
         except requests.exceptions.ConnectionError:
             print(f"连接错误: 无法连接到 {URL}")
@@ -160,9 +168,11 @@ async def me_search_web(params: SearchParams) -> str:
             return "搜索请求超时，请稍后再试"
         except requests.exceptions.RequestException as e:
             print(f"HTTP 请求错误: {str(e)}")
+            print(f"请求参数: {query}")  # 添加请求参数输出
             return "搜索过程中发生错误，请稍后再试"
-        except json.JSONDecodeError:
-            print("返回数据格式错误")
+        except json.JSONDecodeError as e:
+            print(f"返回数据格式错误: {str(e)}")
+            print(f"原始响应: {res.text}")  # 添加完整响应输出
             return "搜索结果解析失败，请稍后再试"
 
         if 'results' in result:
@@ -193,14 +203,13 @@ async def me_search_web(params: SearchParams) -> str:
         return ""
 
 def format_search_results(results: List[Dict[str, Any]]) -> str:
-    """
-    将搜索结果格式化为Markdown格式的字符串
-
-    参数:
-        results (List[Dict[str, Any]]): 搜索结果列表
-
-    返回:
-        str: 格式化后的Markdown字符串
+    """Format search results into markdown.
+    
+    Args:
+        search_results: Results from Searxng search
+        
+    Returns:
+        Formatted markdown string
     """
     if not results:
         return "未找到相关结果"
@@ -235,11 +244,7 @@ def format_search_results(results: List[Dict[str, Any]]) -> str:
 # 修改 test_search 函数
 async def test_search():
     print("\nTesting sear_web_search:")
-    result = await me_search_web(
-        params=SearchParams(
-            q="咳嗽",
-        )
-    )
+    result = await me_search_web(query="咳嗽")
     print(result)  # 直接打印格式化后的 markdown 字符串
     # print(f"找到 {len(result)} 条结果：")
 
@@ -253,6 +258,6 @@ async def test_search():
 
 if __name__ == "__main__":
     print(f"Running Searxng Web Search MCP server...")
-    mcp.run(transport='stdio')
+    mcp.run()
     # asyncio.run(test_search())
 
