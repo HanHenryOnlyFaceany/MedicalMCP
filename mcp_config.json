@@ -1,16 +1,16 @@
 {
+    "me_websearch": {
+      "script": "servers/re_exa_web_search.py",
+      "encoding_error_handler": "ignore",
+      "description": "Search the web using SearxnSearch for reliable medical and health information from trusted sources using Searxng",
+      "active": true
+    },
+    
     "websearch": {
       "script": "servers/exa_web_search.py",
       "encoding_error_handler": "ignore",
       "description": "Web search capability using Exa API that provides real-time internet search results. Supports both basic and advanced search with filtering options including domain restrictions, text inclusion requirements, and date filtering. Returns formatted results with titles, URLs, publication dates, and content summaries.",
       "required_env_vars": ["EXA_API_KEY"],
-      "active": true
-    },
-
-    "me_websearch": {
-      "script": "servers/re_exa_web_search.py",
-      "encoding_error_handler": "ignore",
-      "description": "Search the web using SearxnSearch for reliable medical and health information from trusted sources using Searxng",
       "active": true
     },
 
@@ -23,8 +23,8 @@
     },
 
     "settings": {
-      "model": "gpt-4o",
-      "system_prompt_path": "prompts/system_prompt.txt"
+      "model": "Qwen-qwq32B",
+      "system_prompt_path": "prompts/cn_system_prompt.txt"
     }
     
   }
