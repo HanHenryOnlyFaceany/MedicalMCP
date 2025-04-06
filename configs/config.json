@@ -5,7 +5,11 @@
         "description": "Search the web using SearxnSearch for reliable medical and health information from trusted sources using Searxng",
         "active": true,
         "medical_sites": [
-            "xiaohe.cn/medical"
+            "h5.baike.qq.com/mobile",
+            "xiaohe.cn/medical",
+            "a-hospital.com",
+            "msdmanuals.cn",
+            "fh21.com"
         ]
       }
 }
