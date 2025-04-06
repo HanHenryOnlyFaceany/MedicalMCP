@@ -55,16 +55,19 @@ def get_model_from_config():
 async def main(user_input):
     mcp_config = load_mcp_config()
     # 检查模型是否可用
-    try:
-        model = get_model_from_config()
-        # 测试模型是否正常响应
-        test_response = model.invoke([HumanMessage(content="test")])
-        if not test_response:
-            raise Exception("模型响应为空")
-        print("模型加载成功并可用")
-    except Exception as e:
-        print(f"模型加载失败: {str(e)}")
-        sys.exit(1)
+    # try:
+    #     model = get_model_from_config()
+    #     # 测试模型是否正常响应
+    #     test_response = model.invoke([HumanMessage(content="test")])
+    #     if not test_response:
+    #         raise Exception("模型响应为空")
+    #     print("模型加载成功并可用")
+    # except Exception as e:
+    #     print(f"模型加载失败: {str(e)}")
+    #     sys.exit(1)
+
+
+    model = get_model_from_config()
     
     
     system_prompt_path = mcp_config.get("settings", {}).get("system_prompt_path")
@@ -110,10 +113,15 @@ async def main(user_input):
             print("No servers connected successfully. Exiting.")
             return
       
+        # 检查工具是否正确注册
+        available_tools = client.get_tools()
+        # print("可用工具列表：", available_tools)  # 添加这行来检查工具
+        
+        # 添加更多配置参数
         agent = create_react_agent(
-            model, 
-            client.get_tools(), 
-            state_modifier=system_message  # Changed back to state_modifier
+            model,
+            client.get_tools(),
+            state_modifier=system_message
         )
 
         review_requested = await agent.ainvoke(
@@ -139,5 +147,5 @@ def parse_ai_messages(data):
     return formatted_ai_responses
 
 if __name__ == "__main__":
-    user_query = "咳嗽怎么办？"
+    user_query = "肩膀疼，可能的原因是什么，如何缓解？"
     asyncio.run(main(user_query))
