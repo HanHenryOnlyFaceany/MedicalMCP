@@ -216,6 +216,6 @@ app = Starlette(
 )
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=4323)
+    uvicorn.run(app, host="0.0.0.0", port=4323)
     # print(f"Running Searxng Web Search MCP server...")
     # mcp.run(transport='sse',port=6453)
