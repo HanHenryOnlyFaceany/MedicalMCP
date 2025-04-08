@@ -118,8 +118,8 @@ def filter_medical_results(results: List[Dict[str, Any]], medical_sites: List[st
 async def me_search_web(
     query: str,
     pageno: int = 1,
-    categories: List[SearXNGCategory] = [SearXNGCategory.VIDEOS],
-    engines: str = None,
+    categories: List[SearXNGCategory] = None,
+    engines: str = "bing,baidu,sogou,360search",  # 默认使用这些搜索引擎
     language: str = 'all',
 ) -> str:
     """
@@ -127,6 +127,7 @@ async def me_search_web(
     
     Args:
         query: str - 搜索关键词
+        engines: str - 逗号分隔的搜索引擎列表，例如 "google,bing,duckduckgo"
                     
     Returns:
         str: Markdown 格式的搜索结果，包含标题、链接、摘要和图片
@@ -244,7 +245,7 @@ def format_search_results(results: List[Dict[str, Any]]) -> str:
 # 修改 test_search 函数
 async def test_search():
     print("\nTesting sear_web_search:")
-    result = await me_search_web(query="咳嗽")
+    result = await me_search_web(query="偏头痛")
     print(result)  # 直接打印格式化后的 markdown 字符串
     # print(f"找到 {len(result)} 条结果：")
 
@@ -258,6 +259,6 @@ async def test_search():
 
 if __name__ == "__main__":
     print(f"Running Searxng Web Search MCP server...")
-    mcp.run()
+    mcp.run(transport='stdio')
     # asyncio.run(test_search())
 
