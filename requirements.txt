@@ -26,7 +26,7 @@ jsonpatch==1.33
 jsonpointer==3.0.0
 langchain==0.3.20
 langchain-core==0.3.45
-langchain-mcp-adapters==0.0.4
+langchain-mcp-adapters==0.0.7
 langchain-openai==0.3.8
 langchain-text-splitters==0.3.6
 langgraph==0.3.10

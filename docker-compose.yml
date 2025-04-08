@@ -1,0 +1,50 @@
+version: "3.7"
+
+services:
+  medical_search:
+      build: .
+      ports:
+        - "4323:4323"
+        - "7002:7002"
+      environment:
+        - SEARXNG_HOSTNAME=http://searxng:8080
+        - SEARXNG_SAFE=0
+      volumes:
+        - ./configs:/app/configs
+      depends_on:
+        - searxng
+
+  searxng:
+    container_name: searxng
+    image: docker.io/searxng/searxng:latest
+    restart: unless-stopped
+    networks:
+      - searxng
+    ports:
+      - "0.0.0.0:7070:8080"
+    volumes:
+      - ./deploy/searxng:/etc/searxng:rw    # 修改为 deploy 目录下的 searxng
+    environment:
+      - SEARXNG_BASE_URL=https://${SEARXNG_HOSTNAME:-localhost}/
+      - UWSGI_WORKERS=${SEARXNG_UWSGI_WORKERS:-4}
+      - UWSGI_THREADS=${SEARXNG_UWSGI_THREADS:-4}
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
+
+networks:
+  searxng:
+
+volumes:
+  caddy-data:
+  caddy-config:
+  valkey-data2:
+  
