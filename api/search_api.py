@@ -7,7 +7,7 @@ import os
 
 # 添加父目录到系统路径以导入搜索模块
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from servers.re_exa_web_search import me_search_web, SearXNGCategory
+from pstdio.re_exa_web_search import me_search_web, SearXNGCategory
 
 app = FastAPI(
     title="医疗搜索 API",
@@ -41,4 +41,4 @@ async def health_check():
     return {"status": "healthy"}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=7002)
+    uvicorn.run(app, host="0.0.0.0", port=7002)  # 修改为 0.0.0.0 以允许外部访问
